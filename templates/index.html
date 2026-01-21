@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center py-5 mb-5 bg-success text-white rounded-bottom shadow">
+    <div class="container">
+        <h1 class="display-4 fw-bold">🚜 იპოვე საუკეთესო აგროტექნიკა</h1>
+        <p class="lead">გააქირავე ან იქირავე სასოფლო-სამეურნეო ტექნიკა მარტივად</p>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8">
+                <form action="{{ url_for('index') }}" method="GET" class="d-flex shadow-lg rounded-pill overflow-hidden bg-white p-1">
+                    <input type="text" name="search" class="form-control border-0 px-4 py-3"
+                           placeholder="რა ტიპის ტექნიკას ეძებთ? (მაგ: ტრაქტორი, გუთანი...)"
+                           value="{{ request.args.get('search', '') }}">
+                    <button type="submit" class="btn btn-dark px-4 py-2 rounded-pill m-1">
+                        <i class="bi bi-search"></i> ძებნა
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap">
+        <a href="/?search=ტრაქტორი" class="btn btn-outline-success rounded-pill shadow-sm">🚜 ტრაქტორები</a>
+        <a href="/?search=კომბაინი" class="btn btn-outline-success rounded-pill shadow-sm">🌾 კომბაინები</a>
+        <a href="/?search=მინი" class="btn btn-outline-success rounded-pill shadow-sm">🚜 მინი ტექნიკა</a>
+        <a href="/" class="btn btn-outline-secondary rounded-pill shadow-sm">ყველა</a>
+    </div>
+
+    <div class="row">
+        {% for m in machines %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow border-0 card-hover">
+                    <div class="position-relative">
+                        <img src="{{ url_for('static', filename='uploads/' + m.image_file) }}"
+                             class="card-img-top" alt="{{ m.name }}"
+                             style="height: 230px; object-fit: cover;">
+                        <span class="badge bg-primary position-absolute top-0 end-0 m-3 p-2 shadow price-tag-badge">
+                            {{ m.price }} ₾ / დღე
+                        </span>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title text-dark fw-bold mb-0">{{ m.name }}</h5>
+                            <span class="badge bg-light text-success border border-success small">{{ m.category }}</span>
+                        </div>
+
+                        <p class="text-muted small mt-2 mb-3 flex-grow-1">
+                            {% if m.description %}
+                                {{ m.description[:100] }}{% if m.description|length > 100 %}...{% endif %}
+                            {% else %}
+                                <span class="fst-italic">აღწერა არ არის მითითებული.</span>
+                            {% endif %}
+                        </p>
+
+                        <p class="small text-muted mb-3">
+                            <i class="bi bi-person"></i> მფლობელი: <strong>{{ m.owner.username }}</strong>
+                        </p>
+
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('machine_details', machine_id=m.id) }}" class="btn btn-success flex-grow-1 shadow-sm font-weight-bold">დეტალები</a>
+
+                            {% if current_user.is_authenticated %}
+                                {% if m.owner == current_user or current_user.is_admin %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown"></button>
+                                        <ul class="dropdown-menu shadow border-0">
+                                            <li><a class="dropdown-item text-warning" href="{{ url_for('edit_machine', machine_id=m.id) }}">📝 რედაქტირება</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form action="{{ url_for('delete_machine', machine_id=m.id) }}" method="POST">
+                                                    <button class="dropdown-item text-danger" onclick="return confirm('დარწმუნებული ხართ, რომ გსურთ წაშლა?')">🗑️ წაშლა</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-search text-muted display-1"></i>
+                <h3 class="mt-3 text-muted">ტექნიკა ვერ მოიძებნა</h3>
+                <a href="{{ url_for('index') }}" class="btn btn-success mt-2 rounded-pill px-4">ყველა განცხადების ნახვა</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <footer class="mt-5 py-5 border-top">
+        <div class="container text-center">
+            <p class="text-muted small mb-3">პროექტი ხორციელდება მხარდაჭერით:</p>
+            <a href="https://www.tbceducation.ge/" target="_blank" class="d-inline-block">
+                <img src="{{ url_for('static', filename='uploads/TBC Logo.png') }}"
+                     alt="TBC Logo"
+                     class="tbc-footer-logo">
+            </a>
+            <div class="mt-4">
+                <p class="text-muted small">&copy; 2026 აგროტექნიკის გაქირავება</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    /* Body & Layout */
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #198754 0%, #0d5c36 100%);
+        border-radius: 0 0 50px 50px;
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+    }
+
+    .price-tag-badge {
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .rounded-pill { border-radius: 50px !important; }
+
+    /* Footer & TBC Logo */
+    .tbc-footer-logo {
+        height: 70px;
+        width: auto;
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: all 0.4s ease;
+    }
+
+    .tbc-footer-logo:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}

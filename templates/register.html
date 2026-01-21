@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-5 shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0 font-weight-bold">ანგარიშის შექმნა</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {# WTForms-ის უსაფრთხოების ტეგი #}
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-bold">მომხმარებლის სახელი</label>
+                        {{ form.username(class="form-control", placeholder="მაგ: giorgi123") }}
+                        {% for error in form.username.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-bold">ტელეფონის ნომერი</label>
+                        {{ form.phone(class="form-control", placeholder="მაგ: 599 11 22 33") }}
+                        {% for error in form.phone.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-bold">პაროლი</label>
+                        {{ form.password(class="form-control", placeholder="შეიყვანეთ პაროლი") }}
+                        {% for error in form.password.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold">გაიმეორეთ პაროლი</label>
+                        {{ form.confirm_password(class="form-control", placeholder="ჩაწერეთ პაროლი განმეორებით") }}
+                        {% for error in form.confirm_password.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-block w-100 font-weight-bold">რეგისტრაცია</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <p class="mb-0 small">უკვე გაქვთ ანგარიში? <a href="{{ url_for('login') }}" class="text-primary font-weight-bold">შედით აქ</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

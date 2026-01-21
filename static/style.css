@@ -1,0 +1,108 @@
+/* --- ძირითადი სტილები --- */
+body {
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- ნავიგაციის ზოლი (Navbar) --- */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 3px solid #28a745; /* მწვანე აქცენტი აგრო თემატიკისთვის */
+    background-color: #ffffff !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #28a745 !important;
+}
+
+/* --- ბარათების (Cards) სტილი --- */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+}
+
+.card-hover:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+    height: 230px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+/* --- ღილაკების მორგება --- */
+.btn-success, .btn-primary {
+    background-color: #28a745;
+    border-color: #28a745;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-success:hover, .btn-primary:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.rounded-pill {
+    border-radius: 50px !important;
+}
+
+/* --- ფორმების კონტეინერი (რეგისტრაცია/შესვლა) --- */
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    background-color: #28a745 !important;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* --- ფასის და სხვა ელემენტების სტილი --- */
+.price-tag-badge {
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: #007bff !important;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+
+footer {
+    margin-top: auto;
+    background-color: #ffffff;
+}
+
+.tbc-footer-logo {
+    height: 60px;
+    width: auto;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: all 0.4s ease;
+}
+
+.tbc-footer-logo:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.1);
+}

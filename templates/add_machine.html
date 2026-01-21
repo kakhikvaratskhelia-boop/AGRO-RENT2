@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card mt-4 shadow-lg border-0">
+            <div class="card-header bg-success text-white text-center py-3">
+                <h4 class="mb-0 fw-bold">{{ title }}</h4>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.name.label(class="form-label fw-bold") }}
+                            {{ form.name(class="form-control", placeholder="მაგ: John Deere 6120") }}
+                            {% for error in form.name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form.category.label(class="form-label fw-bold") }}
+                            {{ form.category(class="form-control", placeholder="მაგ: ტრაქტორი") }}
+                            {% for error in form.category.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.price.label(class="form-label fw-bold") }}
+                        <div class="input-group">
+                            {{ form.price(class="form-control", placeholder="0.00") }}
+                            <span class="input-group-text">₾ / დღე</span>
+                        </div>
+                        {% for error in form.price.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label fw-bold") }}
+                        {{ form.description(class="form-control", rows="4", placeholder="აღწერეთ ტექნიკის მდგომარეობა, სიმძლავრე და სხვა დეტალები...") }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-success">
+                            <i class="bi bi-camera"></i> 📸 ატვირთეთ ფოტო
+                        </label>
+                        {{ form.image(class="form-control", onchange="previewImage(event)") }}
+                        <div class="form-text mt-1 text-muted">ნებადართულია: JPG, PNG, JPEG</div>
+
+                        {# ატვირთული ფოტოს წინასწარი ჩვენება #}
+                        <div class="mt-3 text-center">
+                            <img id="imagePreview" src="#" alt="სურათის პრევიუ"
+                                 style="max-height: 180px; display: none; border-radius: 12px; border: 2px dashed #28a745; padding: 5px;">
+                        </div>
+
+                        {% for error in form.image.errors %}
+                            <div class="text-danger small mt-1 d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success btn-lg fw-bold shadow-sm") }}
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">გაუქმება</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# სკრიპტი პრევიუსთვის #}
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('imagePreview');
+            output.src = reader.result;
+            output.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}
