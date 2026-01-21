@@ -23,14 +23,16 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+
 # --- მონაცემთა ბაზა ---
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)  # <-- ახალი სვეტი ტელეფონისთვის
+    phone = db.Column(db.String(20), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     machines = db.relationship('Machine', backref='owner', lazy=True)
+
 
 class Machine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,22 +43,26 @@ class Machine(db.Model):
     image_file = db.Column(db.String(100), nullable=False, default='default.jpg')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 # --- ფორმები ---
 class RegisterForm(FlaskForm):
     username = StringField('სახელი', validators=[DataRequired(), Length(min=2, max=20)])
-    phone = StringField('ტელეფონის ნომერი', validators=[DataRequired()]) # <-- ტელეფონის ველი
+    phone = StringField('ტელეფონის ნომერი', validators=[DataRequired()])
     password = PasswordField('პაროლი', validators=[DataRequired()])
     confirm_password = PasswordField('გაიმეორეთ პაროლი', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('რეგისტრაცია')
+
 
 class LoginForm(FlaskForm):
     username = StringField('მომხმარებელი', validators=[DataRequired()])
     password = PasswordField('პაროლი', validators=[DataRequired()])
     submit = SubmitField('შესვლა')
+
 
 class MachineForm(FlaskForm):
     name = StringField('ტექნიკის დასახელება', validators=[DataRequired()])
@@ -67,6 +73,7 @@ class MachineForm(FlaskForm):
     submit = SubmitField('შენახვა')
 
 
+# --- როუტები ---
 
 @app.route('/')
 def index():
@@ -80,21 +87,34 @@ def index():
         machines = Machine.query.all()
     return render_template('index.html', machines=machines)
 
+
 @app.route('/machine/<int:machine_id>')
 def machine_details(machine_id):
     machine = Machine.query.get_or_404(machine_id)
     return render_template('machine_details.html', machine=machine)
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, phone=form.phone.data, password=form.password.data)
+        # შემოწმება: არსებობს თუ არა მომხმარებელი ამ სახელით
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash('ეს სახელი უკვე დაკავებულია. გთხოვთ, აირჩიოთ სხვა.', 'danger')
+            return redirect(url_for('register'))
+
+        user = User(
+            username=form.username.data,
+            phone=form.phone.data,
+            password=form.password.data
+        )
         db.session.add(user)
         db.session.commit()
         flash('ანგარიში შეიქმნა!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -106,6 +126,7 @@ def login():
             return redirect(url_for('index'))
         flash('არასწორი მონაცემები', 'danger')
     return render_template('login.html', form=form)
+
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -131,6 +152,7 @@ def add_machine():
         flash('განცხადება დაემატა!', 'success')
         return redirect(url_for('index'))
     return render_template('add_machine.html', form=form, title="ტექნიკის დამატება")
+
 
 @app.route('/edit/<int:machine_id>', methods=['GET', 'POST'])
 @login_required
@@ -160,6 +182,7 @@ def edit_machine(machine_id):
         form.description.data = machine.description
     return render_template('add_machine.html', form=form, title="რედაქტირება")
 
+
 @app.route('/delete/<int:machine_id>', methods=['POST'])
 @login_required
 def delete_machine(machine_id):
@@ -171,17 +194,18 @@ def delete_machine(machine_id):
     flash('წაიშალა!', 'info')
     return redirect(url_for('index'))
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         if not User.query.filter_by(username='admin').first():
-            # ადმინისთვისაც ვამატებთ სატესტო ნომერს
             admin = User(username='admin', password='123', phone='555000000', is_admin=True)
             db.session.add(admin)
             db.session.commit()
-    app.run(debug=False)
+    app.run(debug=True)
